@@ -1,3 +1,8 @@
+Lucas Martins Vieira Lima 
+Rafael Toledo de Oliveira
+
+2 semestre ciência da computação.
+
 # R L Moda Masculina
 
 Landing page institucional e comercial para a **R L Moda Masculina**, uma marca de roupas masculinas de grife. O projeto foi pensado para apresentar a curadoria da loja, transmitir exclusividade e incentivar o visitante a entrar em contato com um consultor.
