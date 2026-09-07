@@ -5,12 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const status = document.querySelector('.form-status');
   const messageField = document.querySelector('#message');
   const favoriteKey = 'rl-moda-favorites';
+  const isMobileViewport = () => window.matchMedia('(max-width: 760px)').matches;
 
   const getFavorites = () => {
     try {
-      return JSON.parse(localStorage.getItem(favoriteKey)) || [];
+      const storedFavorites = JSON.parse(localStorage.getItem(favoriteKey));
+      return Array.isArray(storedFavorites) ? storedFavorites : [];
     } catch (error) {
       return [];
+    }
+  };
+
+  const saveFavorites = (favorites) => {
+    try {
+      localStorage.setItem(favoriteKey, JSON.stringify(favorites));
+      return true;
+    } catch (error) {
+      return false;
     }
   };
 
@@ -19,9 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
     mainNav.classList.toggle('open', isOpen);
     menuToggle.setAttribute('aria-expanded', String(isOpen));
     menuToggle.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+    mainNav.setAttribute('aria-hidden', String(isMobileViewport() && !isOpen));
   };
 
   if (menuToggle && mainNav) {
+    setMenuState(false);
     menuToggle.addEventListener('click', () => {
       setMenuState(!mainNav.classList.contains('open'));
     });
@@ -36,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.querySelectorAll('.heart').forEach((button, index) => {
-    const favoriteId = button.closest('.product-card')?.querySelector('h3')?.textContent || String(index);
+    const favoriteId = button.closest('.product-card')?.querySelector('h3')?.textContent.trim() || String(index);
     const favorites = getFavorites();
     const isFavorite = favorites.includes(favoriteId);
     button.classList.toggle('active', isFavorite);
@@ -49,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nextFavorites = active
         ? [...updatedFavorites, favoriteId]
         : updatedFavorites.filter((item) => item !== favoriteId);
-      localStorage.setItem(favoriteKey, JSON.stringify(nextFavorites));
+      saveFavorites(nextFavorites);
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
       button.setAttribute('aria-label', `${active ? 'Remover' : 'Adicionar'} ${favoriteId} ${active ? 'dos' : 'aos'} favoritos`);
@@ -77,6 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
       form.classList.remove('has-error');
       status.textContent = `Obrigado, ${name}! Recebemos sua mensagem e responderemos em breve.`;
       form.reset();
+    });
+
+    form.addEventListener('input', () => {
+      form.classList.remove('has-error');
+      status.textContent = '';
     });
   }
 });
